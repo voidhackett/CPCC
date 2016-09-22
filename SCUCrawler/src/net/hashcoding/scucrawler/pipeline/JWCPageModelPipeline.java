@@ -1,4 +1,4 @@
-package net.hashcoding.scucrawler;
+package net.hashcoding.scucrawler.pipeline;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -13,9 +13,11 @@ public class JWCPageModelPipeline implements PageModelPipeline<JWCPage> {
 
 	@Override
 	public void process(JWCPage page, Task task) {
-		
+		//PageFactory.instance().solve(task.getSite().getDomain(), page);
 		StringBuilder builder = new StringBuilder();
-		builder.append("title => ");
+		builder.append("\ndomain => ");
+		builder.append(page.getUrl());
+		builder.append("\n\n\ntitle => ");
 		builder.append(page.getTitle());
 		builder.append("\ncontent => ");
 		builder.append(page.getContent());
