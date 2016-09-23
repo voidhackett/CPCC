@@ -10,7 +10,7 @@ public class TaskManager {
 
     List<PageTask> tasks;
 
-    public void addTask(PageTask task) {
+    public void delegateTask(PageTask task) {
         tasks.add(task);
     }
 

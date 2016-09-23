@@ -9,7 +9,7 @@ public class Main {
         dumpFilename = "D:\\passage_dump.txt";
 
 		TaskManager manager = TaskManager.instance();
-		manager.addTask(new JWCTask());
+		manager.delegateTask(new JWCTask());
 		manager.run();
 	}
 }
