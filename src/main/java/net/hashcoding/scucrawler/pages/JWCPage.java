@@ -17,17 +17,17 @@ public class JWCPage implements BasePageImpl {
 	String mUrl;
 	
 	@Formatter(formatter = HtmlEscapeFormatter.class)
-	@ExtractBy(value="//body/table[3]/tbody/tr/tb/b")
+	@ExtractBy(value="//body/table[3]/tbody/tr[2]/td/b/text()")
 	String mTitle;
 
 	@Formatter(formatter = HtmlEscapeFormatter.class)
-	@ExtractBy(value="123123//input[@id='news_content']/@value-ddd")
+	@ExtractBy(value="//input[@id='news_content']/@value-ddd")
 	String mContent;
 
-	@ExtractBy(value="//body/table[4]/a/text()")
+	@ExtractBy(value="//body/table[4]//a/text()")
 	List<String> mAttachmentName;
 	
-	@ExtractBy(value="//body/table[4]/a/@href")
+	@ExtractBy(value="//body/table[4]//a/@href")
 	List<String> mAttachmentUrl;
 
 	public String getUrl() {

@@ -2,11 +2,18 @@ package net.hashcoding.scucrawler.task;
 
 import net.hashcoding.scucrawler.pages.JWCPage;
 import net.hashcoding.scucrawler.pipeline.JWCPageModelPipeline;
+import net.hashcoding.scucrawler.solver.HtmlToMarkdownSolver;
+import net.hashcoding.scucrawler.solver.MarkdownToHtmlSolver;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.model.OOSpider;
 
 public class JWCTask extends PageTask {
+
+	public JWCTask() {
+        registerPageSolver(new HtmlToMarkdownSolver());
+        registerPageSolver(new MarkdownToHtmlSolver());
+    }
 
 	@Override
 	public Spider createSpider() {
@@ -15,19 +22,16 @@ public class JWCTask extends PageTask {
 			.addUrl("http://jwc.scu.edu.cn/jwc/moreNotice.action");
 	}
 
-	@Override
 	public void login() {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
 	public void logout() {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
 	public boolean loginState() {
 		// TODO Auto-generated method stub
 		return false;
@@ -45,4 +49,8 @@ public class JWCTask extends PageTask {
 		return false;
 	}
 
+	@Override
+	public String toString() {
+		return "JWCTask";
+	}
 }

@@ -4,9 +4,8 @@ import java.io.IOException;
 
 import net.hashcoding.scucrawler.utils.HtmlToMakedown;
 
-public class HtmlToMakedownSolver implements PageSolver {
+public class HtmlToMarkdownSolver implements PageSolver {
 
-	@Override
 	public String solve(String content) {
 		try {
 			return HtmlToMakedown.convertHtml(content, "GBK");

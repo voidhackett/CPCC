@@ -13,7 +13,8 @@ public abstract class PageTask {
 	public PageTask() {
 		librarys = new ArrayList<PageSolver>();
 	}
-	
+
+	//  按照注册顺序调用
 	public void registerPageSolver(PageSolver solver) {
 		librarys.add(solver);
 	}
@@ -23,12 +24,6 @@ public abstract class PageTask {
 	}
 	
 	public abstract Spider createSpider();
-	
-	public abstract void login();
-	
-	public abstract void logout();
-	
-	public abstract boolean loginState();
 	
 	public abstract boolean isFetchedUrl(String domain);
 	
