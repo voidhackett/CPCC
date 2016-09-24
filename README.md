@@ -12,9 +12,10 @@ SCUCrawler 使用 Web-Magic 作为爬虫框架
 
 ## Dependencies
 
-. webmagic-core
-. webmagic-extension
-. markdownj-core
+1. webmagic-core
+2. webmagic-extension
+3. markdownj-core
+4. RxJava
 
 ## Struction
 
