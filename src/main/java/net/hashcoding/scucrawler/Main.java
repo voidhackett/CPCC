@@ -16,5 +16,6 @@ public class Main {
 		TaskManager manager = TaskManager.instance();
 		manager.delegateTask(new JWCTask());
 		manager.run();
+		PageFactory.instance().stop();
 	}
 }

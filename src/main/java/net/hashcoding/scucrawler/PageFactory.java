@@ -2,6 +2,8 @@ package net.hashcoding.scucrawler;
 
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 import net.hashcoding.scucrawler.pages.BasePageImpl;
 import net.hashcoding.scucrawler.solver.PageSolver;
@@ -11,22 +13,53 @@ import us.codecraft.webmagic.thread.CountableThreadPool;
 
 public class PageFactory implements Runnable {
 
-	PageTask mTask;
+	private PageTask mTask;
+    private boolean mStop;
 
 	private MessageQueue<FactoryRawData> mMessageQueue;
     private CountableThreadPool mTheadPool;
+    private ReentrantLock mNewGoodsLock = new ReentrantLock();
+    private Condition mNewGoodsCondition;
+
+    private void signalNewGoods() {
+        try {
+            mNewGoodsLock.lock();
+            mNewGoodsCondition.signalAll();
+        } finally {
+            mNewGoodsLock.unlock();
+        }
+    }
+
+    private void waitNewGoods() {
+        mNewGoodsLock.lock();
+
+        try {
+            if (mTheadPool.getThreadAlive() == 0 && mStop)
+                return ;
+            mNewGoodsCondition.wait();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            // TODO:
+            System.exit(-1);
+        } finally {
+            mNewGoodsLock.unlock();
+        }
+    }
 
 	public void solve(String url, BasePageImpl page) {
 		assert(mTask != null);
         mMessageQueue.push(new FactoryRawData(mTask, url,
                 page.getTitle(), page.getContent()));
+        signalNewGoods();
 	}
 
     public void run() {
         while (true) {
             FactoryRawData article = mMessageQueue.pop();
             if (article == null) {
-                // TODO:
+                if (mTheadPool.getThreadAlive() == 0 && mStop)
+                    break;
+                waitNewGoods();
             } else {
                 mTheadPool.execute(new Employee(
                         article.getPageTask(), article.getUrl(),
@@ -44,8 +77,13 @@ public class PageFactory implements Runnable {
         thread.setDaemon(false);
         thread.start();
     }
+
+    public void stop() {
+        mStop = true;
+    }
 	
 	private PageFactory() {
+        mStop = false;
         mMessageQueue = new MessageQueue<FactoryRawData>();
         mTheadPool = new CountableThreadPool(Main.FactoryEmployeeSize);
     }
