@@ -32,16 +32,15 @@ public class JWCTask extends PageTask {
 	public Spider createSpider() {
 		return OOSpider.create(Site.me().setSleepTime(1000).setCharset("utf-8"), 
 				new JWCPageModelPipeline(), JWCPage.class)
-			.addUrl(Config.JWCStartUrl);
+			.addUrl(Config.JWCStartUrl).thread(5);
 	}
 
 	private void login() {
 		if (loginState())
             return;
         mStateLock.lock();
-        if (loginState())
-            return;
-        mLoginState = db.login(Config.JWCUsername, Config.JWCPassword);
+        if (!loginState())
+            mLoginState = db.login(Config.JWCUsername, Config.JWCPassword);
         mStateLock.unlock();
 	}
 
@@ -49,9 +48,8 @@ public class JWCTask extends PageTask {
 		if (!loginState())
             return;
         mStateLock.lock();
-        if (!loginState())
-            return ;
-        mLoginState = !db.logout();
+        if (loginState())
+            mLoginState = !db.logout();
         mStateLock.unlock();
 	}
 
