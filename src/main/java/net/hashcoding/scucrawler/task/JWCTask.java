@@ -10,8 +10,12 @@ import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.model.OOSpider;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 public class JWCTask extends PageTask {
 
+    private Lock mStateLock;
     private boolean mLoginState;
     private LeancloudDB db;
 
@@ -21,6 +25,7 @@ public class JWCTask extends PageTask {
 
         db = new LeancloudDB();
         mLoginState = false;
+        mStateLock = new ReentrantLock();
     }
 
 	@Override
@@ -30,33 +35,39 @@ public class JWCTask extends PageTask {
 			.addUrl(Config.JWCStartUrl);
 	}
 
-	public void login() {
-		if (mLoginState)
+	private void login() {
+		if (loginState())
+            return;
+        mStateLock.lock();
+        if (loginState())
             return;
         mLoginState = db.login(Config.JWCUsername, Config.JWCPassword);
+        mStateLock.unlock();
 	}
 
 	public void logout() {
-		if (!mLoginState)
+		if (!loginState())
             return;
+        mStateLock.lock();
+        if (!loginState())
+            return ;
         mLoginState = !db.logout();
+        mStateLock.unlock();
 	}
 
-	public boolean loginState() {
+    private boolean loginState() {
 		return mLoginState;
 	}
 
 	@Override
 	public boolean isFetchedUrl(String url) {
-        if (!loginState())
-            login();
+        login();
 		return db.findUrl(url);
 	}
 
 	@Override
 	public boolean savePage(String url, String title, String content) {
-        if (!loginState())
-            login();
+        login();
 		db.saveUrl(url);
         db.saveArticle(title, content);
 		return true;
@@ -66,4 +77,10 @@ public class JWCTask extends PageTask {
 	public String toString() {
 		return "JWCTask";
 	}
+
+	@Override
+    protected void finalize() throws Throwable {
+        logout();
+        super.finalize();
+    }
 }
