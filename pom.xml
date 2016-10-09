@@ -19,6 +19,11 @@
             <artifactId>webmagic-extension</artifactId>
             <version>0.5.3</version>
         </dependency>
+        <dependency>
+            <groupId>org.markdownj</groupId>
+            <artifactId>markdownj-core</artifactId>
+            <version>0.4</version>
+        </dependency>
     </dependencies>
 
 </project>

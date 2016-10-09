@@ -1,10 +1,12 @@
 package net.hashcoding.scucrawler.solver;
 
+import org.markdownj.MarkdownProcessor;
+
 public class MarkdownToHtmlSolver implements PageSolver {
 
 	public String solve(String content) {
-		// TODO Auto-generated method stub
-		return null;
+		MarkdownProcessor processor = new MarkdownProcessor();
+		return processor.markdown(content);
 	}
 
 }
