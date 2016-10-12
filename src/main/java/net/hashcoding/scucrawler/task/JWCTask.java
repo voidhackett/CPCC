@@ -68,8 +68,9 @@ public class JWCTask extends PageTask {
 	@Override
 	public boolean savePage(String url, String title, String content) {
         login();
-		db.saveUrl(url);
+        // 只有文章保存成功后才将 url 入库，避免潜在错误
         db.saveArticle(title, content);
+        db.saveUrl(url);
 		return true;
 	}
 

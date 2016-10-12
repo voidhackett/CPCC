@@ -18,7 +18,7 @@ public class PageFactory implements Runnable {
 
 	private MessageQueue<FactoryRawData> mMessageQueue;
     private CountableThreadPool mTheadPool;
-    private ReentrantLock mNewGoodsLock = new ReentrantLock();
+    private ReentrantLock mNewGoodsLock;
     private Condition mNewGoodsCondition;
 
     private void signalNewGoods() {
@@ -36,7 +36,7 @@ public class PageFactory implements Runnable {
         try {
             if (mTheadPool.getThreadAlive() == 0 && mStop)
                 return ;
-            mNewGoodsCondition.wait();
+            mNewGoodsCondition.await();
         } catch (InterruptedException e) {
             e.printStackTrace();
             // TODO:
@@ -86,6 +86,8 @@ public class PageFactory implements Runnable {
         mStop = false;
         mMessageQueue = new MessageQueue<FactoryRawData>();
         mTheadPool = new CountableThreadPool(Main.FactoryEmployeeSize);
+        mNewGoodsLock = new ReentrantLock();
+        mNewGoodsCondition = mNewGoodsLock.newCondition();
     }
 
     private static class LazyHolder {

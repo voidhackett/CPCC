@@ -21,6 +21,7 @@ public class TaskManager {
             factory.bindPageTask(task);
             task.createSpider().run();
         }
+        System.out.println("All task is done!");
     }
 
     private TaskManager() {

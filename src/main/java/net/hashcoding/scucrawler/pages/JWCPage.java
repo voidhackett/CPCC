@@ -21,7 +21,7 @@ public class JWCPage implements BasePageImpl {
 	String mTitle;
 
 	@Formatter(formatter = HtmlEscapeFormatter.class)
-	@ExtractBy(value="//input[@id='news_content']/@value-ddd")
+	@ExtractBy(value="//input[@id='news_content']/@value")
 	String mContent;
 
 	@ExtractBy(value="//body/table[4]//a/text()")
