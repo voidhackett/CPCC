@@ -15,13 +15,14 @@ public class TaskManager {
 
     public void run() {
         PageFactory factory = PageFactory.instance();
-        System.out.printf("Begin... total: %d\n\n", tasks.size());
+        System.out.println("Task manager start...");
+        System.out.printf("[total]=%d\n", tasks.size());
         for (PageTask task : tasks) {
-            System.out.printf("\tRunning: %s\n", task.toString());
+            System.out.printf("\tRunning task: %s\n", task.toString());
             factory.bindPageTask(task);
             task.createSpider().run();
         }
-        System.out.println("All task is done!");
+        System.out.println("Task manager stop.");
     }
 
     private TaskManager() {

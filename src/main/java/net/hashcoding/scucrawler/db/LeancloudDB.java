@@ -70,7 +70,6 @@ public class LeancloudDB implements BaseDBImpl {
                     }
                 });
         publishAsync.subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.immediate())
                 .subscribe(new Subscriber<Integer>() {
                     public void onCompleted() {
                         // TODO: success
@@ -83,7 +82,6 @@ public class LeancloudDB implements BaseDBImpl {
                     }
 
                     public void onNext(Integer integer) {
-
                     }
                 });
     }

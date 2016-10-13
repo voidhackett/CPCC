@@ -68,6 +68,7 @@ public class ArticleWrapper {
         public void done(T t, AVException e) {
             if (e == null) {
                 subscriber.onNext(t);
+                subscriber.onCompleted();
             } else {
                 subscriber.onError(e);
             }

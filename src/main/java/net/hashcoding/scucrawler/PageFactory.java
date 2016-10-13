@@ -1,7 +1,7 @@
 package net.hashcoding.scucrawler;
 
 import java.util.List;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -15,9 +15,11 @@ public class PageFactory implements Runnable {
 
 	private PageTask mTask;
     private boolean mStop;
+    private long mEmptySleepTime;
 
+    private Thread mFactoryThread;
 	private MessageQueue<FactoryRawData> mMessageQueue;
-    private CountableThreadPool mTheadPool;
+    private CountableThreadPool mThreadPool;
     private ReentrantLock mNewGoodsLock;
     private Condition mNewGoodsCondition;
 
@@ -34,9 +36,9 @@ public class PageFactory implements Runnable {
         mNewGoodsLock.lock();
 
         try {
-            if (mTheadPool.getThreadAlive() == 0 && mStop)
+            if (mThreadPool.getThreadAlive() == 0 && mStop)
                 return ;
-            mNewGoodsCondition.await();
+            mNewGoodsCondition.await(mEmptySleepTime, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
             // TODO:
@@ -57,15 +59,18 @@ public class PageFactory implements Runnable {
         while (true) {
             FactoryRawData article = mMessageQueue.pop();
             if (article == null) {
-                if (mTheadPool.getThreadAlive() == 0 && mStop)
+                if (mThreadPool.getThreadAlive() == 0 && mStop)
                     break;
                 waitNewGoods();
             } else {
-                mTheadPool.execute(new Employee(
+                mThreadPool.execute(new Employee(
                         article.getPageTask(), article.getUrl(),
                         article.getTitle(), article.getContent()));
             }
         }
+
+        mThreadPool.shutdown();
+        assert(mThreadPool.isShutdown());
     }
 
     public void bindPageTask(PageTask task) {
@@ -73,19 +78,38 @@ public class PageFactory implements Runnable {
 	}
 
 	public void start() {
-        Thread thread = new Thread(this);
-        thread.setDaemon(false);
-        thread.start();
+        System.out.println("Page factory start...");
+        mFactoryThread.setDaemon(false);
+        mFactoryThread.start();
     }
 
-    public void stop() {
+    private void stop() {
         mStop = true;
+    }
+
+    //
+    // must call it in main thread.
+    public void waitFactoryStop() {
+        assert(Thread.currentThread() == Main.MainThread);
+
+        System.out.println("Blocking main thread & wait factory thread stop...");
+        try {
+            stop();
+            mFactoryThread.join();
+            assert(!mFactoryThread.isAlive());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
+        System.out.println("Factory thread stop.");
     }
 	
 	private PageFactory() {
         mStop = false;
+        mEmptySleepTime = 3000;
+        mFactoryThread = new Thread(this);
         mMessageQueue = new MessageQueue<FactoryRawData>();
-        mTheadPool = new CountableThreadPool(Main.FactoryEmployeeSize);
+        mThreadPool = new CountableThreadPool(Main.FactoryEmployeeSize);
         mNewGoodsLock = new ReentrantLock();
         mNewGoodsCondition = mNewGoodsLock.newCondition();
     }
@@ -109,9 +133,8 @@ public class PageFactory implements Runnable {
         }
 
         public void run() {
-            if (mTask.isFetchedUrl(mUIID)) {
+            if (mTask.isFetchedUrl(mUIID))
                 return;
-            }
 
             String content = mContent;
 
