@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.hashcoding.scucrawler.solver.PageSolver;
+import net.hashcoding.scucrawler.utils.Attachment;
 import us.codecraft.webmagic.Spider;
 
 public abstract class PageTask {
@@ -27,5 +28,5 @@ public abstract class PageTask {
 	
 	public abstract boolean isFetchedUrl(String domain);
 	
-	public abstract boolean savePage(String domain, String title, String content);
+	public abstract boolean savePage(String domain, String title, String content, List<Attachment> attachments);
 }

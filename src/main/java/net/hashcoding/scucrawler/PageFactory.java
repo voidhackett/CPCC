@@ -8,6 +8,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import net.hashcoding.scucrawler.pages.BasePageImpl;
 import net.hashcoding.scucrawler.solver.PageSolver;
 import net.hashcoding.scucrawler.task.PageTask;
+import net.hashcoding.scucrawler.utils.Attachment;
 import net.hashcoding.scucrawler.utils.MessageQueue;
 import us.codecraft.webmagic.thread.CountableThreadPool;
 
@@ -51,7 +52,8 @@ public class PageFactory implements Runnable {
 	public void solve(String url, BasePageImpl page) {
 		assert(mTask != null);
         mMessageQueue.push(new FactoryRawData(mTask, url,
-                page.getTitle(), page.getContent()));
+                page.getTitle(), page.getContent(),
+                page.getAttachmentName(), page.getAttachmentUrl()));
         signalNewGoods();
 	}
 
@@ -65,7 +67,8 @@ public class PageFactory implements Runnable {
             } else {
                 mThreadPool.execute(new Employee(
                         article.getPageTask(), article.getUrl(),
-                        article.getTitle(), article.getContent()));
+                        article.getTitle(), article.getContent(),
+                        article.getAttachments()));
             }
         }
 
@@ -124,12 +127,19 @@ public class PageFactory implements Runnable {
         String mUIID;
         String mTitle;
         String mContent;
+        List<Attachment> attachments;
 
-        public Employee(PageTask task, String url, String t, String c) {
+        public Employee(
+                PageTask task,
+                String url,
+                String t,
+                String c,
+                List<Attachment> a) {
             mTask = task;
             mUIID = url;
             mTitle = t;
             mContent = c;
+            attachments = a;
         }
 
         public void run() {
@@ -143,7 +153,7 @@ public class PageFactory implements Runnable {
                 content = sol.solve(content);
             }
 
-            mTask.savePage(mUIID, mTitle, content);
+            mTask.savePage(mUIID, mTitle, content, attachments);
         }
     }
 

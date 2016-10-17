@@ -1,10 +1,15 @@
 package net.hashcoding.scucrawler.db;
 
 import com.avos.avoscloud.*;
+import net.hashcoding.scucrawler.utils.Attachment;
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+
+import java.util.List;
+import java.util.ArrayList;
+
 
 /**
  * Created by Maochuan on 2016/9/23.
@@ -55,7 +60,10 @@ public class LeancloudDB implements BaseDBImpl {
         return false;
     }
 
-    public void saveArticle(final String title, final String content) {
+    public void saveArticle(final String title,
+                            final String content,
+                            final List<Attachment> attachments) {
+
         Observable<String> createAsync = ArticleWrapper.create();
         Observable<String> saveAsync = createAsync.flatMap(
                 new Func1<String, Observable<? extends String>>() {
@@ -63,12 +71,26 @@ public class LeancloudDB implements BaseDBImpl {
                         return ArticleWrapper.save(s, title, content);
                     }
                 });
+
+        // 如果值不为 0 中间加入上传操作
+        if (attachments.isEmpty()) {
+            for (final Attachment attachment : attachments) {
+                saveAsync = saveAsync.flatMap(new Func1<String, Observable<? extends String>>() {
+                            public Observable<String> call(String s) {
+                        return ArticleWrapper.addAttachment(
+                                s, attachment.name, attachment.url);
+                        }
+                    });
+            }
+        }
+
         Observable<Integer> publishAsync = saveAsync.flatMap(
                 new Func1<String, Observable<? extends Integer>>() {
-                    public Observable<? extends Integer> call(String s) {
+                    public Observable<Integer> call(String s) {
                         return ArticleWrapper.publish(s);
                     }
                 });
+
         publishAsync.subscribeOn(Schedulers.io())
                 .subscribe(new Subscriber<Integer>() {
                     public void onCompleted() {

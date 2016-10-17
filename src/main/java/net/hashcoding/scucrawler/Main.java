@@ -22,8 +22,5 @@ public class Main {
 		PageFactory.instance().waitFactoryStop();
 
         System.out.println("All task is done!");
-
-        // TODO: check all child thread is exit.
-        System.exit(0);
 	}
 }

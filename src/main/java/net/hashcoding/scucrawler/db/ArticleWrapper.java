@@ -1,9 +1,8 @@
 package net.hashcoding.scucrawler.db;
 
 
-import com.avos.avoscloud.AVCloud;
-import com.avos.avoscloud.AVException;
-import com.avos.avoscloud.FunctionCallback;
+import com.avos.avoscloud.*;
+import org.apache.commons.collections.map.HashedMap;
 import rx.Observable;
 import rx.Subscriber;
 
@@ -39,6 +38,38 @@ public class ArticleWrapper {
                 params.put("content", content);
                 AVCloud.callFunctionInBackground("saveAnnouncement",
                         params, new FunctionCallbackImpl<String>(subscriber));
+            }
+        });
+    }
+
+    public static Observable<String> addAttachment(final String objectId,
+                                                   final String name,
+                                                   final String url) {
+        return Observable.create(new Observable.OnSubscribe<String>() {
+            public void call(final Subscriber<? super String> subscriber) {
+                // TODO: avcloud save attachments
+                //  first: upload file
+                //  second: add attachment
+                //  return objectId
+            }
+        });
+    }
+
+    public static Observable<AVFile> uploadFile(final String filename, final String url) {
+        return Observable.create(new Observable.OnSubscribe<AVFile>() {
+            public void call(final Subscriber<? super AVFile> subscriber) {
+                final AVFile file = new AVFile(filename, url, new HashedMap());
+                file.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(AVException e) {
+                        if (e == null) {
+                            subscriber.onNext(file);
+                            subscriber.onCompleted();
+                        } else {
+                            subscriber.onError(e);
+                        }
+                    }
+                });
             }
         });
     }
