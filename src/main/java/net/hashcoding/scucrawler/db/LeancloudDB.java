@@ -3,7 +3,9 @@ package net.hashcoding.scucrawler.db;
 import com.avos.avoscloud.*;
 import net.hashcoding.scucrawler.utils.Attachment;
 import rx.Observable;
+import rx.Scheduler;
 import rx.Subscriber;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
@@ -33,17 +35,6 @@ public class LeancloudDB implements BaseDBImpl {
         return true;
     }
 
-    public void saveUrl(String url) {
-        AVObject object = new AVObject("Urls");
-        object.put("url", url);
-        try {
-            object.save();
-        } catch (AVException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        }
-    }
-
     // sync
     public boolean findUrl(String url) {
         AVQuery<AVObject> urls = new AVQuery<AVObject>("Urls");
@@ -60,50 +51,39 @@ public class LeancloudDB implements BaseDBImpl {
         return false;
     }
 
-    public void saveArticle(final String title,
+    public void saveArticle(final String url,
+                            final String title,
                             final String content,
                             final List<Attachment> attachments) {
-
-        Observable<String> createAsync = ArticleWrapper.create();
-        Observable<String> saveAsync = createAsync.flatMap(
-                new Func1<String, Observable<? extends String>>() {
+        ArticleWrapper.create()
+                .flatMap(new Func1<String, Observable<? extends String>>() {
                     public Observable<? extends String> call(String s) {
                         return ArticleWrapper.save(s, title, content);
                     }
-                });
-
-        // 如果值不为 0 中间加入上传操作
-        if (attachments.isEmpty()) {
-            for (final Attachment attachment : attachments) {
-                saveAsync = saveAsync.flatMap(new Func1<String, Observable<? extends String>>() {
-                            public Observable<String> call(String s) {
-                        return ArticleWrapper.addAttachment(
-                                s, attachment.name, attachment.url);
-                        }
-                    });
-            }
-        }
-
-        Observable<Integer> publishAsync = saveAsync.flatMap(
-                new Func1<String, Observable<? extends Integer>>() {
-                    public Observable<Integer> call(String s) {
+                })
+                .flatMap(new Func1<String, Observable<? extends String>>() {
+                    public Observable<? extends String> call(String s) { return ArticleWrapper.addAttachments(s, attachments);
+                    }
+                })
+                .flatMap(new Func1<String, Observable<? extends Integer>>() {
+                    public Observable<? extends Integer> call(String s) {
                         return ArticleWrapper.publish(s);
                     }
-                });
-
-        publishAsync.subscribeOn(Schedulers.io())
-                .subscribe(new Subscriber<Integer>() {
-                    public void onCompleted() {
-                        // TODO: success
+                })
+                .flatMap(new Func1<Integer, Observable<? extends String>>() {
+                    public Observable<? extends String> call(Integer i) {
+                        return ArticleWrapper.saveUrl(url);
                     }
-
-                    public void onError(Throwable throwable) {
-                        // TODO: error
+                })
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Action1<String>() {
+                    public void call(String urlObjectId) {
+                        System.out.printf("url [%s] done\n", url);
+                    }
+                }, new Action1<Throwable>() {
+                    public void call(Throwable throwable) {
+                        System.out.printf("url [%s] is failure\n", url);
                         throwable.printStackTrace();
-                        System.exit(-1);
-                    }
-
-                    public void onNext(Integer integer) {
                     }
                 });
     }

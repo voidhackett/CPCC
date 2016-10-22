@@ -9,9 +9,8 @@ import java.util.List;
  */
 public interface BaseDBImpl {
 
-    void saveUrl(String url);
     boolean findUrl(String url);
     boolean removeUrl(String url);
 
-    void saveArticle(String title, String Content, List<Attachment> attachments);
+    void saveArticle(String url, String title, String Content, List<Attachment> attachments);
 }

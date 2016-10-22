@@ -70,10 +70,7 @@ public class JWCTask extends PageTask {
 	public boolean savePage(String url, String title,
                             String content, List<Attachment> attachments) {
         login();
-        // 只有文章保存成功后才将 url 入库，避免潜在错误
-        db.saveArticle(title, content, attachments);
-        // TODO: 异步流水线操作被写成了同步进行了
-        db.saveUrl(url);
+        db.saveArticle(url, title, content, attachments);
 		return true;
 	}
 
