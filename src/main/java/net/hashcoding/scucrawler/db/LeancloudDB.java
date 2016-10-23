@@ -51,11 +51,12 @@ public class LeancloudDB implements BaseDBImpl {
         return false;
     }
 
-    public void saveArticle(final String url,
+    public void saveArticle(final String type,
+                            final String url,
                             final String title,
                             final String content,
                             final List<Attachment> attachments) {
-        ArticleWrapper.create()
+        ArticleWrapper.create(type)
                 .flatMap(new Func1<String, Observable<? extends String>>() {
                     public Observable<? extends String> call(String s) {
                         return ArticleWrapper.save(s, title, content);

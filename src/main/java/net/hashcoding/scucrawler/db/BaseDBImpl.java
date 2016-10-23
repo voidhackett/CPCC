@@ -12,5 +12,5 @@ public interface BaseDBImpl {
     boolean findUrl(String url);
     boolean removeUrl(String url);
 
-    void saveArticle(String url, String title, String Content, List<Attachment> attachments);
+    void saveArticle(String type, String url, String title, String Content, List<Attachment> attachments);
 }

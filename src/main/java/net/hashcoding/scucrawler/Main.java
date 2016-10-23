@@ -1,6 +1,7 @@
 package net.hashcoding.scucrawler;
 
-import net.hashcoding.scucrawler.task.JWCTask;
+import net.hashcoding.scucrawler.task.JWCAnnounceTask;
+import net.hashcoding.scucrawler.task.JWCTextNewsTask;
 
 public class Main {
 	public static String dumpFilename;
@@ -17,10 +18,11 @@ public class Main {
         PageFactory.instance().start();
 
 		TaskManager manager = TaskManager.instance();
-		manager.delegateTask(new JWCTask());
+		manager.delegateTask(new JWCAnnounceTask());
+		manager.delegateTask(new JWCTextNewsTask());
 		manager.run();
 		PageFactory.instance().waitFactoryStop();
 
-        System.out.println("All task is done!");
+        System.out.println("Now wait all worker thread stop...");
 	}
 }

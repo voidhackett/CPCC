@@ -4,6 +4,7 @@ package net.hashcoding.scucrawler.db;
 import com.avos.avoscloud.*;
 import net.hashcoding.scucrawler.utils.Attachment;
 import org.apache.commons.collections.map.HashedMap;
+import org.apache.http.util.TextUtils;
 import rx.Observable;
 import rx.Subscriber;
 
@@ -16,14 +17,15 @@ import java.util.Map;
  */
 public class ArticleWrapper {
 
-    // leancloud cloud function "String createAnnouncement()"
+    // leancloud cloud function "String createArticle()"
     // return ID of article.
-    public static Observable<String> create() {
+    public static Observable<String> create(final String type) {
         return Observable.create(new Observable.OnSubscribe<String>() {
             public void call(final Subscriber<? super String> subscriber) {
                 try {
                     Map<String, String> params = new HashMap<String, String>();
-                    String objectId = AVCloud.callFunction("createAnnouncement", params);
+                    params.put("type", type);
+                    String objectId = AVCloud.callFunction("createArticle", params);
                     subscriber.onNext(objectId);
                     subscriber.onCompleted();
                 } catch (AVException e) {
@@ -33,18 +35,28 @@ public class ArticleWrapper {
         });
     }
 
-    // String saveAnnouncement(id, title, content)
+    public static Observable<String> save(final String id,
+                                          final String title,
+                                          final String content) {
+        return save(id, title, content, "");
+    }
+
+    // String saveTextArticle(id, title, content, thumbnail)
     // return id of article.
     public static Observable<String> save(final String id,
-                                    final String title, final String content) {
+                                          final String title,
+                                          final String content,
+                                          final String thumbnail) {
         return Observable.create(new Observable.OnSubscribe<String>() {
             public void call(Subscriber<? super String> subscriber) {
                 try {
                     Map<String, String> params = new HashMap<String, String>();
-                    params.put("announce", id);
+                    params.put("objectId", id);
                     params.put("title", title);
                     params.put("content", content);
-                    String objectId = AVCloud.callFunction("saveAnnouncement", params);
+                    if (!TextUtils.isEmpty(thumbnail))
+                        params.put("thumbnail", thumbnail);
+                    String objectId = AVCloud.callFunction("saveTextArticle", params);
                     subscriber.onNext(objectId);
                     subscriber.onCompleted();
                 } catch (AVException e) {
@@ -104,8 +116,8 @@ public class ArticleWrapper {
             public void call(Subscriber<? super Integer> subscriber) {
                 try {
                     Map<String, String> params = new HashMap<String, String>();
-                    params.put("announce", id);
-                    Integer integer = AVCloud.callFunction("publishAnnouncement", params);
+                    params.put("objectId", id);
+                    Integer integer = AVCloud.callFunction("publishArticle", params);
                     subscriber.onNext(integer);
                     subscriber.onCompleted();
                 } catch (AVException e) {

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.hashcoding.scucrawler.task.PageTask;
+import us.codecraft.webmagic.Spider;
 
 public class TaskManager {
 
@@ -20,7 +21,13 @@ public class TaskManager {
         for (PageTask task : tasks) {
             System.out.printf("\tRunning task: %s\n", task.toString());
             factory.bindPageTask(task);
-            task.createSpider().run();
+            Spider spider = task.createSpider();
+            spider.setEmptySleepTime(2000);
+            spider.thread(5);
+            spider.run();
+            assert(spider.getStatus() == Spider.Status.Stopped);
+            spider.close();
+            System.out.printf("\tSpider of %s is done, dispatched to Factory\n", task.toString());
         }
         System.out.println("Task manager stop.");
     }
