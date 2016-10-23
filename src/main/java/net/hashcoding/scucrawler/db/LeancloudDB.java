@@ -53,17 +53,19 @@ public class LeancloudDB implements BaseDBImpl {
 
     public void saveArticle(final String type,
                             final String url,
+                            final String thumbnail,
                             final String title,
                             final String content,
                             final List<Attachment> attachments) {
         ArticleWrapper.create(type)
                 .flatMap(new Func1<String, Observable<? extends String>>() {
                     public Observable<? extends String> call(String s) {
-                        return ArticleWrapper.save(s, title, content);
+                        return ArticleWrapper.save(s, title, content, thumbnail);
                     }
                 })
                 .flatMap(new Func1<String, Observable<? extends String>>() {
-                    public Observable<? extends String> call(String s) { return ArticleWrapper.addAttachments(s, attachments);
+                    public Observable<? extends String> call(String s) {
+                        return ArticleWrapper.addAttachments(s, attachments);
                     }
                 })
                 .flatMap(new Func1<String, Observable<? extends Integer>>() {

@@ -54,8 +54,14 @@ public class ArticleWrapper {
                     params.put("objectId", id);
                     params.put("title", title);
                     params.put("content", content);
-                    if (!TextUtils.isEmpty(thumbnail))
+                    if (!TextUtils.isEmpty(thumbnail)) {
+                        // TODO: image thumbnail
+//                        String filename = "cover" + thumbnail.substring(thumbnail.lastIndexOf('.'));
+//                        AVFile file = new AVFile(filename, thumbnail, new HashMap<String, Object>());
+//                        file.save();
+//                        String coverUrl = file.getThumbnailUrl(true, 100, 100);
                         params.put("thumbnail", thumbnail);
+                    }
                     String objectId = AVCloud.callFunction("saveTextArticle", params);
                     subscriber.onNext(objectId);
                     subscriber.onCompleted();

@@ -30,6 +30,8 @@ public class JWCPage implements BasePageImpl {
 	@ExtractBy(value="//body/table[4]//a/@href")
 	List<String> mAttachmentUrl;
 
+    String mThumbnail;
+
 	public String getUrl() {
 		return mUrl;
 	}
@@ -41,6 +43,18 @@ public class JWCPage implements BasePageImpl {
 	public String getContent() {
 		return mContent;
 	}
+
+	public void setContent(String c) {
+		mContent = c;
+	}
+
+	public void setThumbnail(String t) {
+        mThumbnail = t;
+    }
+
+    public String getThumbnail() {
+        return mThumbnail;
+    }
 
 	public List<String> getAttachmentName() {
 		return mAttachmentName;

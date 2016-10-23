@@ -13,17 +13,20 @@ public class FactoryRawData {
     String mUrl;
     String mTitle;
     String mContent;
+    String mThumbnail;
     List<Attachment> attachmentList;
     PageTask mTask;
 
     public FactoryRawData(
             PageTask task,
             String url,
+            String thumb,
             String t,
             String c,
             List<String> filename,
             List<String> urls) {
         mUrl = url;
+        mThumbnail = thumb;
         mTitle = t;
         mContent = c;
         mTask = task;
@@ -50,6 +53,10 @@ public class FactoryRawData {
 
     public String getContent() {
         return mContent;
+    }
+
+    public String getThumbnail() {
+        return mThumbnail;
     }
 
     public List<Attachment> getAttachments() {

@@ -28,5 +28,5 @@ public abstract class PageTask {
 	
 	public abstract boolean isFetchedUrl(String domain);
 	
-	public abstract boolean savePage(String domain, String title, String content, List<Attachment> attachments);
+	public abstract boolean savePage(String url, String thumb, String title, String content, List<Attachment> attachments);
 }

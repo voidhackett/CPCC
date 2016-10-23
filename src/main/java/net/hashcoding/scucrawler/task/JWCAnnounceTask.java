@@ -69,12 +69,16 @@ public class JWCAnnounceTask extends PageTask {
 	}
 
 	@Override
-	public boolean savePage(String url, String title,
-                            String content, List<Attachment> attachments) {
+	public boolean savePage(String url,
+                            String thumb,
+                            String title,
+                            String content,
+                            List<Attachment> attachments) {
         login();
         db.saveArticle(
                 Config.TypeAnnouncement,
                 url,
+				thumb,
                 title,
                 content,
                 attachments);

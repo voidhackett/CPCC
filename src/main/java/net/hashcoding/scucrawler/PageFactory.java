@@ -52,6 +52,7 @@ public class PageFactory implements Runnable {
 	public void solve(String url, BasePageImpl page) {
 		assert(mTask != null);
         mMessageQueue.push(new FactoryRawData(mTask, url,
+                page.getThumbnail(),
                 page.getTitle(), page.getContent(),
                 page.getAttachmentName(), page.getAttachmentUrl()));
         signalNewGoods();
@@ -66,8 +67,11 @@ public class PageFactory implements Runnable {
                 waitNewGoods();
             } else {
                 mThreadPool.execute(new Employee(
-                        article.getPageTask(), article.getUrl(),
-                        article.getTitle(), article.getContent(),
+                        article.getPageTask(),
+                        article.getUrl(),
+                        article.getThumbnail(),
+                        article.getTitle(),
+                        article.getContent(),
                         article.getAttachments()));
             }
         }
@@ -127,16 +131,19 @@ public class PageFactory implements Runnable {
         String mUIID;
         String mTitle;
         String mContent;
+        String mThumbnail;
         List<Attachment> attachments;
 
         public Employee(
                 PageTask task,
                 String url,
+                String thumb,
                 String t,
                 String c,
                 List<Attachment> a) {
             mTask = task;
             mUIID = url;
+            mThumbnail = thumb;
             mTitle = t;
             mContent = c;
             attachments = a;
@@ -153,7 +160,7 @@ public class PageFactory implements Runnable {
                 content = sol.solve(content);
             }
 
-            mTask.savePage(mUIID, mTitle, content, attachments);
+            mTask.savePage(mUIID, mThumbnail, mTitle, content, attachments);
         }
     }
 
