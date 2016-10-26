@@ -61,6 +61,8 @@ public class ArticleWrapper {
 //                        file.save();
 //                        String coverUrl = file.getThumbnailUrl(true, 100, 100);
                         params.put("thumbnail", thumbnail);
+                    } else {
+                        params.put("thumbnail", "");
                     }
                     String objectId = AVCloud.callFunction("saveTextArticle", params);
                     subscriber.onNext(objectId);
