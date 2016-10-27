@@ -1,8 +1,7 @@
 package net.hashcoding.scucrawler.pipeline;
 
 import net.hashcoding.scucrawler.Main;
-import net.hashcoding.scucrawler.PageFactory;
-import net.hashcoding.scucrawler.pages.BasePageImpl;
+import net.hashcoding.scucrawler.pages.BasePage;
 import org.apache.http.util.TextUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -13,29 +12,27 @@ import us.codecraft.webmagic.pipeline.PageModelPipeline;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 
 /**
  * Created by Maochuan on 2016/9/23.
  */
-public class DumpPageModelPipeline implements PageModelPipeline<BasePageImpl> {
+public class DumpPageModelPipeline implements PageModelPipeline<BasePage> {
 
-    public void process(BasePageImpl page, Task task) {
-        String thumbnail = imagesAddHost(page, task.getSite().getDomain());
+    public void process(BasePage page, Task task) {
+        imagesAddHost(page, task.getSite().getDomain());
 
         StringBuilder builder = new StringBuilder();
         builder.append("\ndomain => ");
         builder.append(page.getUrl());
-        builder.append("\n\n\ntitle => ");
+        builder.append("\ntitle => ");
         builder.append(page.getTitle());
-        builder.append("\bthumbnail => ");
-        builder.append(thumbnail);
+        builder.append("\nthumbnail => ");
+        builder.append(page.getThumbnail());
         builder.append("\ncontent => ");
-        builder.append(page.getContent());
-        builder.append("\n\nattachment => {\n");
+        builder.append(page.getContent().substring(0, 150));
+        builder.append("\nattachment => {\n");
         List<String> names = page.getAttachmentName();
         List<String> urls = page.getAttachmentUrl();
         assert(names.size() == urls.size());
@@ -48,7 +45,7 @@ public class DumpPageModelPipeline implements PageModelPipeline<BasePageImpl> {
             builder.append(urlit.next());
             builder.append("\n");
         }
-        builder.append("\n}\n");
+        builder.append("\n}\n\n");
 
         FileWriter writer;
         try {
@@ -60,20 +57,24 @@ public class DumpPageModelPipeline implements PageModelPipeline<BasePageImpl> {
         }
     }
 
-    private String imagesAddHost(BasePageImpl page, String host) {
+    private void imagesAddHost(BasePage page, String host) {
+        // absUrl need protocol of host
+        if (!host.startsWith("http://") && !host.startsWith("HTTP://")) {
+            host = "http://" + host;
+        }
         String content = page.getContent();
-        final String []thumbnail = {""};
+        final String[] thumbnail = {""};
         Document root = Jsoup.parse(content);
         root.setBaseUri(host);
         Elements images = root.select("img");
         images.forEach((Element element) -> {
-            String url = host + element.attr("src");
+            String url = element.absUrl("src");
             element.attr("src", url);
             if (TextUtils.isEmpty(thumbnail[0]))
                 thumbnail[0] = url;
         });
         content = root.toString();
         page.setContent(content);
-        return thumbnail[0];
+        page.setThumbnail(thumbnail[0]);
     }
 }

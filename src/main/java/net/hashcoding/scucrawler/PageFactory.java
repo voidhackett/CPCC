@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-import net.hashcoding.scucrawler.pages.BasePageImpl;
+import net.hashcoding.scucrawler.pages.BasePage;
 import net.hashcoding.scucrawler.solver.PageSolver;
 import net.hashcoding.scucrawler.task.PageTask;
 import net.hashcoding.scucrawler.utils.Attachment;
@@ -49,7 +49,7 @@ public class PageFactory implements Runnable {
         }
     }
 
-	public void solve(String url, BasePageImpl page) {
+	public void solve(String url, BasePage page) {
 		assert(mTask != null);
         mMessageQueue.push(new FactoryRawData(mTask, url,
                 page.getThumbnail(),

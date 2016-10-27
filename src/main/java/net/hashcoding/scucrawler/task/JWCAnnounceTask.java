@@ -4,31 +4,19 @@ import net.hashcoding.scucrawler.Config;
 import net.hashcoding.scucrawler.db.LeancloudDB;
 import net.hashcoding.scucrawler.pages.JWCPage;
 import net.hashcoding.scucrawler.pipeline.DefaultPageModelPipeline;
-import net.hashcoding.scucrawler.pipeline.JWCPageModelPipeline;
 import net.hashcoding.scucrawler.solver.HtmlToMarkdownSolver;
 import net.hashcoding.scucrawler.solver.MarkdownToHtmlSolver;
-import net.hashcoding.scucrawler.utils.Attachment;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.model.OOSpider;
 
-import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
-public class JWCAnnounceTask extends PageTask {
-
-    private Lock mStateLock;
-    private boolean mLoginState;
-    private LeancloudDB db;
+public class JWCAnnounceTask extends LeancloudBaseTask {
 
 	public JWCAnnounceTask() {
+		super(Config.TypeAnnouncement,
+                Config.JWCUsername, Config.JWCPassword);
         registerPageSolver(new HtmlToMarkdownSolver());
         registerPageSolver(new MarkdownToHtmlSolver());
-
-        db = new LeancloudDB();
-        mLoginState = false;
-        mStateLock = new ReentrantLock();
     }
 
 	@Override
@@ -40,59 +28,8 @@ public class JWCAnnounceTask extends PageTask {
 		return spider.addUrl(Config.JWCAnnounceStartUrls);
 	}
 
-	private void login() {
-		if (loginState())
-            return;
-        mStateLock.lock();
-        if (!loginState())
-            mLoginState = db.login(Config.JWCUsername, Config.JWCPassword);
-        mStateLock.unlock();
-	}
-
-	public void logout() {
-		if (!loginState())
-            return;
-        mStateLock.lock();
-        if (loginState())
-            mLoginState = !db.logout();
-        mStateLock.unlock();
-	}
-
-    private boolean loginState() {
-		return mLoginState;
-	}
-
-	@Override
-	public boolean isFetchedUrl(String url) {
-        login();
-		return db.findUrl(url);
-	}
-
-	@Override
-	public boolean savePage(String url,
-                            String thumb,
-                            String title,
-                            String content,
-                            List<Attachment> attachments) {
-        login();
-        db.saveArticle(
-                Config.TypeAnnouncement,
-                url,
-				thumb,
-                title,
-                content,
-                attachments);
-		return true;
-	}
-
 	@Override
 	public String toString() {
 		return "JWC announce task";
 	}
-
-	@Override
-    protected void finalize() throws Throwable {
-        logout();
-        super.finalize();
-    }
 }

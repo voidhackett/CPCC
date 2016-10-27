@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.hashcoding.scucrawler.task.PageTask;
+import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Spider;
+import us.codecraft.webmagic.SpiderListener;
 
 public class TaskManager {
 

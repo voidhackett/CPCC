@@ -1,7 +1,6 @@
 package net.hashcoding.scucrawler;
 
-import net.hashcoding.scucrawler.task.JWCAnnounceTask;
-import net.hashcoding.scucrawler.task.JWCTextNewsTask;
+import net.hashcoding.scucrawler.task.*;
 
 public class Main {
 	public static String dumpFilename;
@@ -20,6 +19,10 @@ public class Main {
 		TaskManager manager = TaskManager.instance();
 		manager.delegateTask(new JWCAnnounceTask());
 		manager.delegateTask(new JWCTextNewsTask());
+		manager.delegateTask(new XGBAnnounceTask());
+		manager.delegateTask(new XGBTextNewsTask());
+		manager.delegateTask(new QCCDAnnounceTask());
+		manager.delegateTask(new QCCDTextNewsTask());
 		manager.run();
 		PageFactory.instance().waitFactoryStop();
 

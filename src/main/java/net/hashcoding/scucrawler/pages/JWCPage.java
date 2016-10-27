@@ -11,7 +11,7 @@ import us.codecraft.webmagic.model.annotation.TargetUrl;
 
 @TargetUrl("http://jwc.scu.edu.cn/jwc/newsShow.action*")
 @HelpUrl("http://jwc.scu.edu.cn/jwc/moreNotice.action")
-public class JWCPage implements BasePageImpl {
+public class JWCPage implements BasePage {
 
 	@ExtractByUrl(".*")
 	String mUrl;

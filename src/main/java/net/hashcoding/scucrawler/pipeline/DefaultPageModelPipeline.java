@@ -1,7 +1,7 @@
 package net.hashcoding.scucrawler.pipeline;
 
 import net.hashcoding.scucrawler.PageFactory;
-import net.hashcoding.scucrawler.pages.BasePageImpl;
+import net.hashcoding.scucrawler.pages.BasePage;
 import org.apache.http.util.TextUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -10,21 +10,17 @@ import org.jsoup.select.Elements;
 import us.codecraft.webmagic.Task;
 import us.codecraft.webmagic.pipeline.PageModelPipeline;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.function.Consumer;
-
 /**
  * Created by Maochuan on 2016/10/17.
  */
 public class DefaultPageModelPipeline
-        implements PageModelPipeline<BasePageImpl> {
-    public void process(BasePageImpl page, Task task) {
+        implements PageModelPipeline<BasePage> {
+    public void process(BasePage page, Task task) {
         imagesAddHost(page, task.getSite().getDomain());
         PageFactory.instance().solve(page.getUrl(), page);
     }
 
-    private void imagesAddHost(BasePageImpl page, String host) {
+    private void imagesAddHost(BasePage page, String host) {
         // absUrl need protocol of host
         if (!host.startsWith("http://") && !host.startsWith("HTTP://")) {
             host = "http://" + host;
