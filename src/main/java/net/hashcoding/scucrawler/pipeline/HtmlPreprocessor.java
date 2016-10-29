@@ -3,9 +3,13 @@ package net.hashcoding.scucrawler.pipeline;
 import net.hashcoding.scucrawler.pages.BasePage;
 import org.apache.http.util.TextUtils;
 import org.jsoup.Jsoup;
+import org.jsoup.helper.StringUtil;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import us.codecraft.xsoup.Xsoup;
+
+import java.util.List;
 
 /**
  * Created by Maochuan on 2016/10/29.
@@ -51,7 +55,16 @@ public class HtmlPreprocessor {
         page.setContent(root.toString());
     }
 
+    public static void attachmentAddHost(BasePage page, String host) {
+        // 这里 urls 内部实现为 ArrayList
+        List<String> urls = page.getAttachmentUrl();
+        int size = urls.size();
+        for (int i = 0; i < size; ++i) {
+            urls.set(i, StringUtil.resolve(host, urls.get(i)));
+        }
+    }
+
     public static void processOmitsAttachments(BasePage page) {
-        // TODO:
+        // TODO: 等待大神
     }
 }

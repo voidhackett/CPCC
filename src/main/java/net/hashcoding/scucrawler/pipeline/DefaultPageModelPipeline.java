@@ -18,6 +18,7 @@ public class DefaultPageModelPipeline
         HtmlPreprocessor.imagesAddHostAndGetThumbnail(page, host);
         HtmlPreprocessor.hyperlinksAddHost(page, host);
         HtmlPreprocessor.processOmitsAttachments(page);
+        HtmlPreprocessor.attachmentAddHost(page, host);
 
         // Process
         PageFactory.instance().solve(page.getUrl(), page);

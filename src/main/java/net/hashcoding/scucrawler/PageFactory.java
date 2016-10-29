@@ -4,13 +4,14 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import net.hashcoding.scucrawler.model.FactoryRawData;
 import net.hashcoding.scucrawler.pages.BasePage;
 import net.hashcoding.scucrawler.solver.PageSolver;
 import net.hashcoding.scucrawler.task.PageTask;
 import net.hashcoding.scucrawler.model.Attachment;
-import net.hashcoding.scucrawler.utils.MessageQueue;
 import us.codecraft.webmagic.thread.CountableThreadPool;
 
 public class PageFactory implements Runnable {
@@ -20,7 +21,7 @@ public class PageFactory implements Runnable {
     private long mEmptySleepTime;
 
     private Thread mFactoryThread;
-	private MessageQueue<FactoryRawData> mMessageQueue;
+	private BlockingQueue<FactoryRawData> mMessageQueue;
     private CountableThreadPool mThreadPool;
     private ReentrantLock mNewGoodsLock;
     private Condition mNewGoodsCondition;
@@ -43,8 +44,7 @@ public class PageFactory implements Runnable {
             mNewGoodsCondition.await(mEmptySleepTime, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
-            // TODO:
-            System.exit(-1);
+            Thread.currentThread().interrupt();
         } finally {
             mNewGoodsLock.unlock();
         }
@@ -52,16 +52,30 @@ public class PageFactory implements Runnable {
 
 	public void solve(String url, BasePage page) {
 		assert(mTask != null);
-        mMessageQueue.push(new FactoryRawData(mTask, url,
+        FactoryRawData data = new FactoryRawData(
+                mTask,
+                url,
                 page.getThumbnail(),
-                page.getTitle(), page.getContent(),
-                page.getAttachmentName(), page.getAttachmentUrl()));
+                page.getTitle(),
+                page.getContent(),
+                page.getAttachmentName(),
+                page.getAttachmentUrl());
+
+        while (!mMessageQueue.offer(data)) {
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                Thread.currentThread().interrupt();
+            }
+        }
+
         signalNewGoods();
 	}
 
     public void run() {
         while (true) {
-            FactoryRawData article = mMessageQueue.pop();
+            FactoryRawData article = mMessageQueue.poll();
             if (article == null) {
                 if (mThreadPool.getThreadAlive() == 0 && mStop)
                     break;
@@ -116,7 +130,7 @@ public class PageFactory implements Runnable {
         mStop = false;
         mEmptySleepTime = 3000;
         mFactoryThread = new Thread(this);
-        mMessageQueue = new MessageQueue<FactoryRawData>();
+        mMessageQueue = new LinkedBlockingQueue<>(1000);
         mThreadPool = new CountableThreadPool(Main.FactoryEmployeeSize);
         mNewGoodsLock = new ReentrantLock();
         mNewGoodsCondition = mNewGoodsLock.newCondition();
@@ -135,7 +149,7 @@ public class PageFactory implements Runnable {
         String mThumbnail;
         List<Attachment> attachments;
 
-        public Employee(
+        private Employee(
                 PageTask task,
                 String url,
                 String thumb,

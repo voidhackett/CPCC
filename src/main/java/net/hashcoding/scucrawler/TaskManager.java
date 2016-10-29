@@ -4,13 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.hashcoding.scucrawler.task.PageTask;
-import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Spider;
-import us.codecraft.webmagic.SpiderListener;
 
 public class TaskManager {
 
-    List<PageTask> tasks;
+    private List<PageTask> tasks;
 
     public void delegateTask(PageTask task) {
         tasks.add(task);

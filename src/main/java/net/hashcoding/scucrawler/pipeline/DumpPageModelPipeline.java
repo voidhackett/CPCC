@@ -23,6 +23,7 @@ public class DumpPageModelPipeline implements PageModelPipeline<BasePage> {
         HtmlPreprocessor.imagesAddHostAndGetThumbnail(page, host);
         HtmlPreprocessor.hyperlinksAddHost(page, host);
         HtmlPreprocessor.processOmitsAttachments(page);
+        HtmlPreprocessor.attachmentAddHost(page, host);
 
         // dump
         StringBuilder builder = new StringBuilder();

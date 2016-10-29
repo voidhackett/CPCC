@@ -10,7 +10,7 @@ public class HtmlToMarkdownSolver implements PageSolver {
 		try {
 			return HtmlToMakedown.convertHtml(content, "GBK");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			// ignore
 			e.printStackTrace();
 			return null;
 		}
