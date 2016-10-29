@@ -4,7 +4,7 @@
 
 ## Support
 
-目前仅做了教务处部分
+目前做了教务处、学工部、青春川大
 
 # Construction
 
@@ -16,6 +16,7 @@ SCUCrawler 使用 Web-Magic 作为爬虫框架
 2. webmagic-extension
 3. markdownj-core
 4. RxJava
+5. AVOScloud
 
 ## Struction
 
@@ -26,4 +27,9 @@ Task 由 TaskManager 管理，在 main 中进行任务委托，TaskManager 依�
 PageFactory 用于控制数据筛选及加工，每个 Task 均可注册 Solver 定制加工过程，Solver 调用顺序由注册顺序决定。
 
 DB 部分负责管理 url 及对应内容。
+
+# TODO
+
+需要从内容中提取不规范的附件
+
 
