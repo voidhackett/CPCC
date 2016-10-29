@@ -1,4 +1,4 @@
-package net.hashcoding.scucrawler.utils;
+package net.hashcoding.scucrawler.model;
 
 /**
  * Created by Maochuan on 2016/10/17.

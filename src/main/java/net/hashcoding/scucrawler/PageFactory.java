@@ -5,10 +5,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
+import net.hashcoding.scucrawler.model.FactoryRawData;
 import net.hashcoding.scucrawler.pages.BasePage;
 import net.hashcoding.scucrawler.solver.PageSolver;
 import net.hashcoding.scucrawler.task.PageTask;
-import net.hashcoding.scucrawler.utils.Attachment;
+import net.hashcoding.scucrawler.model.Attachment;
 import net.hashcoding.scucrawler.utils.MessageQueue;
 import us.codecraft.webmagic.thread.CountableThreadPool;
 

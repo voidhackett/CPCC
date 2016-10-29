@@ -1,6 +1,6 @@
 package net.hashcoding.scucrawler.db;
 
-import net.hashcoding.scucrawler.utils.Attachment;
+import net.hashcoding.scucrawler.model.Attachment;
 
 import java.util.List;
 

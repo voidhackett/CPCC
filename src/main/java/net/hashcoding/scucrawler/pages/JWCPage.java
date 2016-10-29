@@ -2,7 +2,7 @@ package net.hashcoding.scucrawler.pages;
 
 import java.util.List;
 
-import net.hashcoding.scucrawler.HtmlEscapeFormatter;
+import net.hashcoding.scucrawler.utils.HtmlEscapeFormatter;
 import us.codecraft.webmagic.model.annotation.ExtractBy;
 import us.codecraft.webmagic.model.annotation.ExtractByUrl;
 import us.codecraft.webmagic.model.annotation.Formatter;

@@ -1,7 +1,7 @@
 package net.hashcoding.scucrawler.task;
 
 import net.hashcoding.scucrawler.db.LeancloudDB;
-import net.hashcoding.scucrawler.utils.Attachment;
+import net.hashcoding.scucrawler.model.Attachment;
 
 import java.util.List;
 import java.util.concurrent.locks.Lock;

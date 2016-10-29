@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.hashcoding.scucrawler.solver.PageSolver;
-import net.hashcoding.scucrawler.utils.Attachment;
+import net.hashcoding.scucrawler.model.Attachment;
 import us.codecraft.webmagic.Spider;
 
 public abstract class PageTask {

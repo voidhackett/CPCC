@@ -1,6 +1,6 @@
 package net.hashcoding.scucrawler.pages;
 
-import net.hashcoding.scucrawler.HtmlEscapeFormatter;
+import net.hashcoding.scucrawler.utils.HtmlEscapeFormatter;
 import us.codecraft.webmagic.model.annotation.*;
 
 import java.util.List;

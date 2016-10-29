@@ -1,16 +1,14 @@
 package net.hashcoding.scucrawler.db;
 
 import com.avos.avoscloud.*;
-import net.hashcoding.scucrawler.utils.Attachment;
+import net.hashcoding.scucrawler.model.Attachment;
+import net.hashcoding.scucrawler.network.ArticleWrapper;
 import rx.Observable;
-import rx.Scheduler;
-import rx.Subscriber;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 import java.util.List;
-import java.util.ArrayList;
 
 
 /**
