@@ -2,11 +2,6 @@ package net.hashcoding.scucrawler.pipeline;
 
 import net.hashcoding.scucrawler.Main;
 import net.hashcoding.scucrawler.pages.BasePage;
-import org.apache.http.util.TextUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import us.codecraft.webmagic.Task;
 import us.codecraft.webmagic.pipeline.PageModelPipeline;
 
@@ -21,60 +16,62 @@ import java.util.List;
 public class DumpPageModelPipeline implements PageModelPipeline<BasePage> {
 
     public void process(BasePage page, Task task) {
-        imagesAddHost(page, task.getSite().getDomain());
+        String host = HtmlPreprocessor.getHostWithProtocol(
+                task.getSite().getDomain());
 
+        // Pretreatment
+        HtmlPreprocessor.imagesAddHostAndGetThumbnail(page, host);
+        HtmlPreprocessor.hyperlinksAddHost(page, host);
+        HtmlPreprocessor.processOmitsAttachments(page);
+
+        // dump
         StringBuilder builder = new StringBuilder();
         builder.append("\ndomain => ");
         builder.append(page.getUrl());
+        dumpTitleAndThumbnail(builder, page);
+        dumpContent(builder, page);
+        dumpAttachment(builder, page);
+        dumpToFile(builder.toString());
+    }
+
+    private void dumpTitleAndThumbnail(
+            StringBuilder builder, BasePage page) {
         builder.append("\ntitle => ");
         builder.append(page.getTitle());
         builder.append("\nthumbnail => ");
         builder.append(page.getThumbnail());
+    }
+
+    private void dumpContent(StringBuilder builder, BasePage page) {
         builder.append("\ncontent => ");
         builder.append(page.getContent().substring(0, 150));
+    }
+
+    private void dumpAttachment(StringBuilder builder, BasePage page) {
         builder.append("\nattachment => {\n");
         List<String> names = page.getAttachmentName();
         List<String> urls = page.getAttachmentUrl();
         assert(names.size() == urls.size());
-        Iterator<String> nameit = names.iterator();
-        Iterator<String> urlit = urls.iterator();
-        while (nameit.hasNext() && urlit.hasNext()) {
+        Iterator<String> nameIt = names.iterator();
+        Iterator<String> urlIt = urls.iterator();
+        while (nameIt.hasNext() && urlIt.hasNext()) {
             builder.append("\r");
-            builder.append(nameit.next());
+            builder.append(nameIt.next());
             builder.append(" => ");
-            builder.append(urlit.next());
+            builder.append(urlIt.next());
             builder.append("\n");
         }
         builder.append("\n}\n\n");
+    }
 
+    private void dumpToFile(String content) {
         FileWriter writer;
         try {
             writer = new FileWriter(Main.dumpFilename, true);
-            writer.write(builder.toString());
+            writer.write(content);
             writer.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private void imagesAddHost(BasePage page, String host) {
-        // absUrl need protocol of host
-        if (!host.startsWith("http://") && !host.startsWith("HTTP://")) {
-            host = "http://" + host;
-        }
-        String content = page.getContent();
-        final String[] thumbnail = {""};
-        Document root = Jsoup.parse(content);
-        root.setBaseUri(host);
-        Elements images = root.select("img");
-        images.forEach((Element element) -> {
-            String url = element.absUrl("src");
-            element.attr("src", url);
-            if (TextUtils.isEmpty(thumbnail[0]))
-                thumbnail[0] = url;
-        });
-        content = root.toString();
-        page.setContent(content);
-        page.setThumbnail(thumbnail[0]);
     }
 }
